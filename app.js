@@ -7,12 +7,15 @@ const ttf_maker = require("./ttf.js");
 const app = express();
 const port = 3000;
 
+const configs = require("config/config.json");
+
+let fontName;
+
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(express.static(`images`));
+app.use(express.static(configs.save_dir));
 
 app.get("/", (req, res) => {
-  // let files = fs.readdirSync(`ttf-maker/${save_dir}`);
-  let files = fs.readdirSync(`./images/`);
+  let files = fs.readdirSync(configs.save_dir);
   let samples = [
     files[100],
     files[200],
@@ -50,11 +53,12 @@ app.get("/", (req, res) => {
           <input name="blurradius" type="range" min="0" max="2" step="0.1" value="1" style="width:350px;">
           <p>blurdelta</p>
           <input name="blurdelta" type="range" min="0" max="2" step="0.1" value="1" style="width:350px;">
+          <p></p>
+          <input name="fontname" type="text" value="customFont.ttf" style="width:350px;">
           <input id="save_button" type="submit">Save</button>
         </div>   
       </form> 
-      <!-- <img src="/${samples[0]}" alt="sample img"/> -->
-      <img src="/${samples[0]}" alt="sample img"/>
+      <img src="${configs.save_dir}/${samples[0]}" alt="sample img"/>
     </body>
   </html>
 `);
@@ -70,13 +74,14 @@ app.post("/vector", (req, res) => {
     blurdelta: req.body.blurdelta,
   };
 
-  ttf_maker(options, "images");
+  fontName = req.body.fontname;
+  ttf_maker(options, configs.save_dir, fontName);
 
   res.redirect("/download_ttf");
 });
 
 app.get("/download_ttf", (req, res) => {
-  const file = `ttf-fonts/customfont.ttf`;
+  const file = `fonts/${fontName}`;
   res.download(file);
 });
 
