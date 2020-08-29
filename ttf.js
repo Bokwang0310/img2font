@@ -39,12 +39,12 @@ module.exports = (customOption, save_dir, fontName) => {
   let sources = [];
 
   // 원본 파일 이름으로부터 유니코드명 및 svg 파일 이름 추출
-  for (let i = 0; i < files.length; i++) {
+  for (let i = 0; i < fileNames.length; i++) {
     sources[i] = "0x" + fileNames[i].substring(0, 5);
   }
 
   // 각각의 이미지로부터 각각의 SVG 파일 생성
-  for (let i = 0; i < files.length; i++) {
+  for (let i = 0; i < fileNames.length; i++) {
     let j = i;
 
     let data = fs.readFileSync(`${save_dir}/${fileNames[j]}`);
@@ -81,7 +81,7 @@ module.exports = (customOption, save_dir, fontName) => {
     .on("finish", () => {
       let svgdata = fs.readFileSync("svg_font/font.svg", "utf8");
       let ttf = svg2ttf(svgdata, {});
-      fs.writeFileSync("fonts/customfont.ttf", new Buffer(ttf.buffer));
+      fs.writeFileSync("fonts/customfont.ttf", Buffer.from(ttf.buffer));
     })
     .on("error", (err) => {
       console.log(err);

@@ -7,7 +7,7 @@ const ttf_maker = require("./ttf.js");
 const app = express();
 const port = 3000;
 
-const configs = require("config/config.json");
+const configs = require("./config/config.json");
 
 let fontName;
 
@@ -55,7 +55,7 @@ app.get("/", (req, res) => {
           <input name="blurdelta" type="range" min="0" max="2" step="0.1" value="1" style="width:350px;">
           <p></p>
           <input name="fontname" type="text" value="customFont.ttf" style="width:350px;">
-          <input id="save_button" type="submit">Save</button>
+          <input id="save_button" type="submit" value="Save">
         </div>   
       </form> 
       <img src="${configs.save_dir}/${samples[0]}" alt="sample img"/>
@@ -77,7 +77,23 @@ app.post("/vector", (req, res) => {
   fontName = req.body.fontname;
   ttf_maker(options, configs.save_dir, fontName);
 
-  res.redirect("/download_ttf");
+  res.redirect("/check_download");
+});
+
+app.get("/check_download", (req, res) => {
+  res.send(`
+  <!DOCTYPE html>
+  <html lang="ko">
+    <head>
+      <meta charset="UTF-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <title>Download TTF</title>
+    </head>
+    <body>
+      <a href="/download_ttf">Download</a>
+    </body>
+  </html>
+  `);
 });
 
 app.get("/download_ttf", (req, res) => {
