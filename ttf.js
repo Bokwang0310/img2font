@@ -9,10 +9,30 @@ module.exports = (customOption, save_dir) => {
     fontName: "customfont",
   });
 
-  // 폴더가 없을 때 파일 읽기에 실패하는 에러 방지
+  // 폴더 에러 방지
   try {
-    fs.mkdirSync("svg-font");
-  } catch (error) {}
+    fs.statSync("svg_font");
+  } catch (err) {
+    if (err.code === "ENOENT") {
+      fs.mkdirSync("svg-font");
+    }
+  }
+
+  try {
+    fs.statSync("svgs");
+  } catch (err) {
+    if (err.code === "ENOENT") {
+      fs.mkdirSync("svgs");
+    }
+  }
+
+  try {
+    fs.statSync("fonts");
+  } catch (err) {
+    if (err.code === "ENOENT") {
+      fs.mkdirSync("fonts");
+    }
+  }
 
   let files = fs.readdirSync(`${save_dir}`);
 
@@ -54,12 +74,7 @@ module.exports = (customOption, save_dir) => {
     options.linefilter = true;
 
     let svgstring = ImageTracer.imagedataToSVG(myImageData, options);
-    try {
-      fs.writeFileSync(`./svg/${fileName[j]}.svg`, svgstring);
-    } catch (error) {
-      fs.mkdirSync("svg");
-      fs.writeFileSync(`./svg/${fileName[j]}.svg`, svgstring);
-    }
+    fs.writeFileSync(`./svg/${fileName[j]}.svg`, svgstring);
   }
 
   // 폰트 이벤트리스너
@@ -68,12 +83,7 @@ module.exports = (customOption, save_dir) => {
     .on("finish", () => {
       let svgdata = fs.readFileSync("./svg-font/font.svg", "utf8");
       let ttf = svg2ttf(svgdata, {});
-      try {
-        fs.writeFileSync("./ttf-fonts/customfont.ttf", new Buffer(ttf.buffer));
-      } catch (error) {
-        fs.mkdirSync("ttf-fonts");
-        fs.writeFileSync("./ttf-fonts/customfont.ttf", new Buffer(ttf.buffer));
-      }
+      fs.writeFileSync("./ttf-fonts/customfont.ttf", new Buffer(ttf.buffer));
     })
     .on("error", (err) => {
       console.log(err);
